@@ -2,8 +2,8 @@ import useSuspense from './useSuspense'
 import { useState, useCallback } from 'react'
 
 export default function useSuspended(func) {
-	const [_, suspend] = useSuspense()
-	const [error, setError] = useState()
+	const { suspend } = useSuspense()
+	const [error, log] = useState()
 
 	if (error) throw error
 	return useCallback(async (...args) => {
@@ -12,7 +12,7 @@ export default function useSuspended(func) {
 			return await func(...args)
 		} catch(error) {
 			console.error(error)
-			setError(error)
+			log(error)
 		} finally {
 			suspend(false)
 		}
