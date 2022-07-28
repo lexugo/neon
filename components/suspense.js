@@ -1,35 +1,51 @@
-import { useState } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import useSuspense from '../hooks/useSuspense'
 
 import { Suspenseful } from '../contexts'
 
-function useContext() {
-	const suspense = useSuspense()
-	const [suspended, setSuspended] = useState(false)
-	const [suspending, setSuspending] = useState(false)
+function useSuspenseful() {
+	const context = useContext(Suspenseful)
+	const [suspended, setSuspended] = useState([])
+	const [suspending, setSuspending] = useState([])
 
-	function suspend(value) {
-		setSuspended(value)
-		if (suspense.raise) suspense.raise(value)
+	function suspend(id) {
+		if (suspended.includes(id)) return
+
+		setSuspended(suspended => [...suspended, id])
+		if (context.raise) context.raise(id)
 	}
 
-	function raise(value) {
-		setSuspending(value)
-		if (suspense.raise) suspense.raise(value)
+	function unsuspend(id) {
+		setSuspended(suspended => suspended.filter(i => i !== id))
+		context.lower(id)
+	}
+
+	function raise(id) {
+		if (suspending.includes(id)) return
+
+		setSuspending(suspending => [...suspending, id])
+		if (context.raise) context.raise(value)
+	}
+
+	function lower(id) {
+		setSuspending(suspending => suspending.filter(i => i !== id))
+		if (context.lower) context.lower(id)
 	}
 
 	return {
-		suspended, suspend,
-		suspending, raise
+		suspended: useMemo(() => !!suspended.length, [suspended]),
+		suspend, unsuspend,
+		suspending: useMemo(() => !!suspending.length, [suspending]),
+		raise, lower
 	}
 }
 
 export default function Suspense({ children, fallback }) {
-	const context = useContext()
+	const context = useSuspenseful()
 
 	return (
 		<Suspenseful.Provider value={context}>
-			{ context.suspended ? fallback : children }
+			{ context.suspended.length ? fallback : children }
 		</Suspenseful.Provider>
 	)
 }
@@ -42,7 +58,7 @@ export function suspenseful(render) {
 	Component.displayName = render.name
 
 	return function Suspense(props) {
-		const context = useContext()
+		const context = useSuspenseful()
 
 		return (
 			<Suspenseful.Provider value={context}>
