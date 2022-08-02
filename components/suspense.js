@@ -17,7 +17,7 @@ function useSuspenseful() {
 
 	function unsuspend(id) {
 		setSuspended(suspended => suspended.filter(i => i !== id))
-		context.lower(id)
+		if (context.lower) context.lower(id)
 	}
 
 	function raise(id) {

@@ -1,4 +1,4 @@
-import { useContext, useCallback, useId, useMemo } from 'react'
+import { useContext, useCallback, useId } from 'react'
 
 import { Suspenseful } from '../contexts'
 
