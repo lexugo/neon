@@ -16,6 +16,7 @@ export { default as useDevice } from './hooks/useDevice'
 export { default as useSuspense } from './hooks/useSuspense'
 export { default as useSuspended } from './hooks/useSuspended'
 export { default as useRouting } from './hooks/useRouting'
+export { default as useSideEffect } from './hooks/useSideEffect'
 
 // Export higher-order hooks
 export { default as memoized } from './hooks/memoized'
